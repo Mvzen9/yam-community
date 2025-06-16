@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 1800">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #9f4e2a;
+        font-size: 191.246170043945312px;
+        text-decoration: underline;
+      }
+
+      .cls-1, .cls-2 {
+        font-family: LEMONMILK-Bold, 'LEMON MILK';
+        font-weight: 700;
+      }
+
+      .cls-2 {
+        fill: none;
+        font-size: 130.861968994140625px;
+        stroke: #9f4e2a;
+        stroke-miterlimit: 10;
+        stroke-width: 6px;
+        text-decoration: line-through;
+      }
+    </style>
+  </defs>
+  <text class="cls-1" transform="translate(293.9384765625 1088.2900390625)"><tspan x="0" y="0">LEMON MILK</tspan></text>
+  <text class="cls-2" transform="translate(472.046875 856.72216796875)"><tspan x="0" y="0">font name</tspan></text>
+</svg>

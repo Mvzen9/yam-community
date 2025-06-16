@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Load user data and token from localStorage
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    
+
     if (storedUser && storedToken) {
       try {
         setUser(JSON.parse(storedUser));
@@ -83,19 +83,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const response = await authAPI.login(emailOrUser, password);
       const data = response.data;
-      
+
       if (data.code === 200) {
         // Set token first so it's available for subsequent API calls
         setToken(data.token);
         localStorage.setItem('token', data.token);
         localStorage.setItem('tokenExpiration', data.expirationDate);
         localStorage.setItem('refreshTokenExpiration', data.refreshTokenExpirationDate);
-        
+        localStorage.setItem('refreshToken', data.refreshToken)
+
         try {
           // Fetch complete user profile using the userId from login response
           const profileResponse = await authAPI.getUserProfile(data.userId);
           const profileData = profileResponse.data;
-          
+
           // Create user object from profile response
           const userData: User = {
             id: profileData.userId,
@@ -111,13 +112,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             birthdate: profileData.birthDate,
             gender: profileData.gender,
           };
-          
+
           // Store user data
           setUser(userData);
           localStorage.setItem('user', JSON.stringify(userData));
         } catch (profileErr) {
           console.error('Failed to fetch user profile after login:', profileErr);
-          
+
           // Fallback to basic user data if profile fetch fails
           const basicUserData: User = {
             id: data.userId,
@@ -131,7 +132,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             following: 0,
             notifications: 0,
           };
-          
+
           setUser(basicUserData);
           localStorage.setItem('user', JSON.stringify(basicUserData));
         }
@@ -159,15 +160,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await authAPI.register(registerData);
       const data = response.data;
-      
+
       if (data.code === 200) {
         // Registration successful, but we don't set user and token yet
         // We'll wait for email verification to complete before setting these
-        
+
         // Return the userId for potential use in verification flow
         return { userId: data.userId };
       } else {
@@ -194,7 +195,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const sendVerificationCode = async (email: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`https://todo-app.polandcentral.cloudapp.azure.com:5004/api/Auth/send-code?usernameOrEmail=${email}`, {
         method: 'POST',
@@ -204,7 +205,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       const data = await response.json();
-      
+
       if (data.code === 200) {
         return {
           token: data.token,
@@ -225,7 +226,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const verifyCode = async (code: string, tempToken: string, userData?: any) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`https://todo-app.polandcentral.cloudapp.azure.com:5004/api/Auth/verify?code=${code}`, {
         method: 'POST',
@@ -236,22 +237,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       const data = await response.json();
-      
+
       if (data.code === 200) {
         // Update token with the permanent one
         setToken(data.token);
-        
+
         // Save to localStorage for persistence
         localStorage.setItem('token', data.token);
         localStorage.setItem('tokenExpiration', data.expirationDate);
-        
+
         // If we have user data with userId, fetch complete profile
         if (userData && userData.id) {
           try {
             // Fetch complete user profile using the userId
             const profileResponse = await authAPI.getUserProfile(userData.id);
             const profileData = profileResponse.data;
-            
+
             // Create user object from profile response
             const completeUserData: User = {
               id: profileData.userId,
@@ -267,13 +268,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               birthdate: profileData.birthDate || userData.birthdate,
               gender: profileData.gender || userData.gender,
             };
-            
+
             // Store user data
             setUser(completeUserData);
             localStorage.setItem('user', JSON.stringify(completeUserData));
           } catch (profileErr) {
             console.error('Failed to fetch user profile after verification:', profileErr);
-            
+
             // Fallback to provided user data if profile fetch fails
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));

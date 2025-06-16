@@ -29,6 +29,8 @@ import { CommentProvider } from './store/CommentContext';
 
 // Layout
 import Layout from './components/layout/Layout';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -44,8 +46,47 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
   return children;
 };
-
+interface RefreshTokenResponse {
+  code: number;
+  messasge: string; // Note: This matches the typo in your JSON
+  userId: string;
+  token: string;
+  expirationDate: string; // This will be a string in ISO date format
+  refreshTokenExpirationDate: string; // Also a string in ISO date format
+}
 function App() {
+
+
+  useEffect(() => {
+    // The function you want to run
+    const myScript = async () => {
+      try {
+        const refreshToken = localStorage.getItem("refreshToken")
+        const headers = {
+          'Content-Type': 'application/json' // Assuming you're sending JSON data
+        };
+        const result = await axios.get<RefreshTokenResponse>(`https://todo-app.polandcentral.cloudapp.azure.com:5004/api/Auth/refresh-token?refreshToken=${refreshToken}`, { headers: headers })
+        localStorage.setItem("token", result.data.token)
+      } catch {
+        localStorage.removeItem("token")
+
+      }
+    };
+
+    // Run the script immediately on component mount
+    myScript();
+
+    // Set up the interval to run the script every 15 minutes
+    // 15 minutes = 15 * 60 seconds * 1000 milliseconds
+    const intervalId = setInterval(myScript, 60 * 1000);
+
+    // This is the cleanup function.
+    // It runs when the component unmounts.
+    return () => {
+      console.log('Clearing interval.');
+      clearInterval(intervalId);
+    };
+  }, []);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

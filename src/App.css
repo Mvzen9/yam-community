@@ -1,0 +1,74 @@
+#root {
+  wi.yam-logo {
+    font-family: "Karla", sans-serif;
+    font-optical-sizing: auto;
+    font-size: 2.5rem;
+    color: #9b4f2b !important;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    font-weight: 800;
+    font-style: normal;
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    text-decoration: none !important;
+    text-transform: uppercase;
+  }
+  margin: 0 auto;
+  text-align: center;
+}
+
+.jacquarda-bastarda-9-regular {
+  font-family: "Karla", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.yam-logo {
+  font-family: "lemon", serif;
+  font-size: 2.5rem;
+  color: #9b4f2b !important;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  text-decoration: none !important;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}

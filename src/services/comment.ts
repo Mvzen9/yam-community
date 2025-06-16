@@ -2,18 +2,16 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 // Create an axios instance with a base URL
 const commentAPI: AxiosInstance = axios.create({
-  baseURL: 'https://todo-app.polandcentral.cloudapp.azure.com:5003/api',
+  baseURL: 'http://todo-app.polandcentral.cloudapp.azure.com:5003/api',
 });
 
 // Add a request interceptor to include the auth token in all requests
 commentAPI.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -34,6 +32,7 @@ commentAPI.interceptors.response.use(
 
 // Interface for comment data from API
 export interface CommentData {
+  replies: never[];
   commentId: string;
   content: string;
   createdAt: string;
@@ -73,7 +72,7 @@ export const getPostComments = async (postId: string, pageIndex?: number, pageSi
   let url = `/Comment?postId=${postId}`;
   if (pageIndex !== undefined) url += `&pageIndex=${pageIndex}`;
   if (pageSize !== undefined) url += `&pageSize=${pageSize}`;
-  
+
   try {
     const response = await commentAPI.get(url);
     console.log('Comments API response:', response.data);

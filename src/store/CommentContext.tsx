@@ -3,7 +3,7 @@ import { CommentData, createComment, getPostComments, updateComment, deleteComme
 import { useAuth } from './AuthContext';
 
 interface CommentContextType {
-  commentsByPost: {[postId: string]: CommentData[]};
+  commentsByPost: { [postId: string]: CommentData[] };
   currentPostId: string | null;
   loading: boolean;
   error: string | null;
@@ -29,7 +29,7 @@ interface CommentProviderProps {
 
 export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  const [commentsByPost, setCommentsByPost] = useState<{[postId: string]: CommentData[]}>({});
+  const [commentsByPost, setCommentsByPost] = useState<{ [postId: string]: CommentData[] }>({});
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
 
     try {
       const fetchedComments = await getPostComments(postId, pageIndex, pageSize);
-      
+
       // Process comments to add author information for UI display
       const processedComments = fetchedComments.map(comment => ({
         ...comment,
@@ -53,13 +53,13 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
         createdAt: comment.createdAt, // Add createdAt from API response
         replies: [], // Initialize empty replies array
       }));
-      
+
       // Store comments by postId instead of overwriting the global state
       setCommentsByPost(prev => ({
         ...prev,
         [postId]: processedComments
       }));
-      
+
       return processedComments;
     } catch (err) {
       console.error('Failed to fetch comments:', err);
@@ -87,7 +87,7 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
       };
 
       const newComment = await createComment(commentData);
-      
+
       // Add author information for UI display
       const commentWithAuthor = {
         ...newComment,
@@ -131,14 +131,14 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
       return commentWithAuthor;
     } catch (err: any) {
       console.error('Failed to add comment:', err);
-      
+
       // Check for toxic content error
       if (err.response?.data?.message === "The comment contains toxic content.") {
         setError('Your comment contains inappropriate or toxic content and cannot be posted');
       } else {
         setError('Failed to post your comment');
       }
-      
+
       throw err; // Rethrow to allow component-level handling
     } finally {
       setLoading(false);
@@ -160,40 +160,40 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
       // Update the comment in the state for all posts that might contain this comment
       setCommentsByPost(prev => {
         const updatedCommentsByPost = { ...prev };
-        
+
         // Loop through all posts to find and update the comment
         Object.keys(updatedCommentsByPost).forEach(pid => {
           updatedCommentsByPost[pid] = updatedCommentsByPost[pid].map(comment => {
             if (comment.commentId === commentId) {
               return { ...comment, content };
             }
-            
+
             // Check if it's in replies
             if (comment.replies && comment.replies.length > 0) {
-              const updatedReplies = comment.replies.map(reply => 
+              const updatedReplies = comment.replies.map(reply =>
                 reply.commentId === commentId ? { ...reply, content } : reply
               );
               return { ...comment, replies: updatedReplies };
             }
-            
+
             return comment;
           });
         });
-        
+
         return updatedCommentsByPost;
       });
 
       return updatedComment;
     } catch (err: any) {
       console.error('Failed to edit comment:', err);
-      
+
       // Check for toxic content error
       if (err.response?.data?.message === "The comment contains toxic content.") {
         setError('Your comment contains inappropriate or toxic content and cannot be posted');
       } else {
         setError('Failed to update your comment');
       }
-      
+
       throw err; // Rethrow to allow component-level handling
     } finally {
       setLoading(false);
@@ -216,12 +216,12 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
         // Remove the comment from all posts that might contain it
         setCommentsByPost(prev => {
           const updatedCommentsByPost = { ...prev };
-          
+
           // Loop through all posts to find and remove the comment
           Object.keys(updatedCommentsByPost).forEach(pid => {
             // First check if it's a top-level comment
             const filteredComments = updatedCommentsByPost[pid].filter(comment => comment.commentId !== commentId);
-            
+
             // If the length is the same, it might be a reply
             if (filteredComments.length === updatedCommentsByPost[pid].length) {
               updatedCommentsByPost[pid] = updatedCommentsByPost[pid].map(comment => {
@@ -237,7 +237,7 @@ export const CommentProvider: React.FC<CommentProviderProps> = ({ children }) =>
               updatedCommentsByPost[pid] = filteredComments;
             }
           });
-          
+
           return updatedCommentsByPost;
         });
       }

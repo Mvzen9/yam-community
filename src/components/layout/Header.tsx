@@ -42,8 +42,22 @@ import ExploreIcon from "@mui/icons-material/Explore";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAuth } from "../../store/AuthContext";
 import { useNotifications } from "../../store/NotificationContext";
-import { useChat } from "../../store/ChatContext";
+import RequestItem from "../RequestItem";
+import FriendRequestsPopover from "../FriendRequestsPopover";
 
+const handleAcceptRequest = (requestId, username) => {
+  // Add your accept logic here - like API calls
+  console.log(`Accepting friend request from ${username}`);
+  // Example: call your API to accept the request
+  // acceptFriendRequestAPI(requestId);
+};
+
+const handleDeclineRequest = (requestId, username) => {
+  // Add your decline logic here - like API calls
+  console.log(`Declining friend request from ${username}`);
+  // Example: call your API to decline the request
+  // declineFriendRequestAPI(requestId);
+};
 
 // Enhanced search component with animations
 const Search = styled("div")(({ theme }) => ({
@@ -118,7 +132,6 @@ const Header = () => {
     unreadCount: notificationCount,
     markAsRead,
   } = useNotifications();
-  const { unreadCount: messageCount } = useChat();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] =
@@ -180,7 +193,7 @@ const Header = () => {
         navigate("/media");
         break;
       case 4:
-        navigate("/people");
+        navigate("/requests");
         break;
       default:
         navigate("/");
@@ -215,7 +228,7 @@ const Header = () => {
               color="inherit"
               aria-label="menu"
               onClick={handleMobileMenuOpen}
-              sx={{ 
+              sx={{
                 mr: 1,
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
@@ -238,8 +251,8 @@ const Header = () => {
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
             {isAuthenticated ? (
               <>
-                <IconButton 
-                  color="inherit" 
+                <IconButton
+                  color="inherit"
                   onClick={() => navigate('/chat')}
                   sx={{
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -249,9 +262,22 @@ const Header = () => {
                     },
                   }}
                 >
-                  <Badge badgeContent={messageCount} color="error">
-                    <ChatIcon />
-                  </Badge>
+
+
+
+                </IconButton>
+                <IconButton
+                  color="inherit"
+                  onClick={() => window.open('https://yam-chat.netlify.app/', '_blank')}
+                  sx={{
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'scale(1.1)',
+                      backgroundColor: 'rgba(155, 79, 43, 0.1)',
+                    },
+                  }}
+                >
+                  <ChatIcon />
                 </IconButton>
                 <IconButton
                   color="inherit"
@@ -286,8 +312,8 @@ const Header = () => {
                   <Avatar
                     src={user?.avatar}
                     alt={user?.username}
-                    sx={{ 
-                      width: 32, 
+                    sx={{
+                      width: 32,
                       height: 32,
                       border: '2px solid rgba(155, 79, 43, 0.2)',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -299,8 +325,8 @@ const Header = () => {
                   />
                   <Typography
                     variant="body2"
-                    sx={{ 
-                      ml: 1, 
+                    sx={{
+                      ml: 1,
                       display: { xs: "none", lg: "block" },
                       fontWeight: 600,
                       color: 'text.primary',
@@ -368,46 +394,6 @@ const Header = () => {
           px: 2,
         }}
       >
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          aria-label="navigation tabs"
-          indicatorColor="primary"
-          textColor="inherit"
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
-            minHeight: "48px",
-            "& .MuiTab-root": {
-              minHeight: "48px",
-              textTransform: "none",
-              fontSize: "16px",
-              fontWeight: 500,
-              px: 3,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': {
-                color: theme.palette.primary.main,
-                transform: 'translateY(-1px)',
-                backgroundColor: 'rgba(155, 79, 43, 0.05)',
-              },
-              '&.Mui-selected': {
-                color: theme.palette.primary.main,
-                fontWeight: 600,
-              },
-            },
-            "& .MuiTabs-indicator": {
-              height: 3,
-              borderRadius: '3px 3px 0 0',
-              background: 'linear-gradient(135deg, #9B4F2B 0%, #B67D62 100%)',
-            },
-          }}
-        >
-          <Tab label="Posts" />
-          <Tab label="Communities" />
-          <Tab label="Comments" />
-          <Tab label="Media" />
-          <Tab label="People" />
-        </Tabs>
       </Box>
 
       <Box
@@ -506,7 +492,7 @@ const Header = () => {
             <ListItemText>Create Post</ListItemText>
           </MenuItem>
           <Divider sx={{ my: 1 }} />
-          <MenuItem 
+          <MenuItem
             onClick={handleLogout}
             sx={{
               borderRadius: 1,
@@ -525,75 +511,13 @@ const Header = () => {
       </Menu>
 
       {/* Enhanced Notifications popover */}
-      <Popover
-        open={Boolean(notificationAnchorEl)}
-        anchorEl={notificationAnchorEl}
+      <FriendRequestsPopover
+        isOpen={Boolean(notificationAnchorEl)}
         onClose={() => setNotificationAnchorEl(null)}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(242, 226, 208, 0.3)',
-            boxShadow: '0 8px 30px rgba(155, 79, 43, 0.15)',
-            mt: 1,
-          },
-        }}
-      >
-        <List sx={{ width: 320, maxHeight: 400, overflow: "auto" }}>
-          {notifications.map((notification) => (
-            <ListItem
-              key={notification.id}
-              disablePadding
-              sx={{
-                backgroundColor: notification.read
-                  ? "transparent"
-                  : alpha(theme.palette.primary.main, 0.1),
-              }}
-            >
-              <ListItemButton
-                onClick={() => {
-                  markAsRead(notification.id);
-                  if (notification.link) {
-                    navigate(notification.link);
-                  }
-                  setNotificationAnchorEl(null);
-                }}
-                sx={{
-                  borderRadius: 1,
-                  margin: '2px 4px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
-                  },
-                }}
-              >
-                <ListItemText
-                  primary={notification.message}
-                  secondary={new Date(notification.timestamp).toLocaleString()}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          {notifications.length === 0 && (
-            <ListItem>
-              <ListItemText 
-                primary="No notifications" 
-                sx={{ textAlign: 'center', color: 'text.secondary' }}
-              />
-            </ListItem>
-          )}
-        </List>
-      </Popover>
+        friendRequests={[]} // Replace with your actual friend requests array
+        onAcceptRequest={handleAcceptRequest}
+        onDeclineRequest={handleDeclineRequest}
+      />
 
       {/* Enhanced Chat popover */}
       <Popover
@@ -621,8 +545,8 @@ const Header = () => {
       >
         <List sx={{ width: 320, maxHeight: 400, overflow: "auto" }}>
           <ListItem>
-            <ListItemText 
-              primary="Messages coming soon!" 
+            <ListItemText
+              primary="Messages coming soon!"
               sx={{ textAlign: 'center', color: 'text.secondary' }}
             />
           </ListItem>
@@ -732,7 +656,7 @@ const Header = () => {
                 <ListItemText>Create Post</ListItemText>
               </MenuItem>
               <Divider sx={{ my: 1 }} />
-              <MenuItem 
+              <MenuItem
                 onClick={handleLogout}
                 sx={{
                   borderRadius: 1,

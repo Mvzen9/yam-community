@@ -32,6 +32,7 @@ const ProfilePage = () => {
 
 
   const profileData = useGetProfile(userId!);
+  console.log(userId);
 
   useEffect(() => {
     // Fetch user data based on userId

@@ -21,7 +21,7 @@ const getProfile = async (id: string): Promise<ProfielResponseObject> => {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json' // Assuming you're sending JSON data
     };
-    const result = await axios.get<ProfielResponseObject>(`http://todo-app.polandcentral.cloudapp.azure.com:5004/api/Auth?userId=${id}`, { headers: headers })
+    const result = await axios.get<ProfielResponseObject>(`https://todo-app.polandcentral.cloudapp.azure.com:5004/api/Auth?userId=${id}`, { headers: headers })
 
     return result.data
 }

@@ -36,19 +36,19 @@ const CommunityPage = () => {
   const { userCommunities, loading: communityLoading, error: communityError, fetchUserCommunities, generateInviteCode, joinCommunityWithCode, leaveCommunity, deleteCommunity, modifyCommunity } = useCommunity();
   const { user } = useAuth();
   const { communityPosts, loading: postsLoading, error: postsError } = usePost();
-  
+
   const [community, setCommunity] = useState<CommunityType | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [totalPosts, setTotalPosts] = useState(0);
-  
+
   // Pagination and filtering state
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
   // Dialog states
   const [openJoinDialog, setOpenJoinDialog] = useState(false);
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
@@ -56,7 +56,7 @@ const CommunityPage = () => {
   const [openModifyDialog, setOpenModifyDialog] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const [joinCode, setJoinCode] = useState('');
-  
+
   // Modify community form state
   const [modifyFormData, setModifyFormData] = useState({
     name: '',
@@ -64,7 +64,7 @@ const CommunityPage = () => {
   });
   const [modifyBannerFile, setModifyBannerFile] = useState<File | null>(null);
   const [modifyBannerPreview, setModifyBannerPreview] = useState<string | null>(null);
-  
+
   // Snackbar states
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -73,7 +73,7 @@ const CommunityPage = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-  
+
   const handleJoinCommunity = async () => {
     try {
       await joinCommunityWithCode(joinCode);
@@ -86,10 +86,10 @@ const CommunityPage = () => {
       showSnackbar(error.message || 'Failed to join community', 'error');
     }
   };
-  
+
   const handleLeaveCommunity = async () => {
     if (!communityId) return;
-    
+
     try {
       await leaveCommunity(communityId);
       showSnackbar('Successfully left community', 'success');
@@ -98,10 +98,10 @@ const CommunityPage = () => {
       showSnackbar(error.message || 'Failed to leave community', 'error');
     }
   };
-  
+
   const handleGenerateInviteCode = async () => {
     if (!communityId) return;
-    
+
     try {
       const code = await generateInviteCode(communityId);
       setInviteCode(code);
@@ -110,10 +110,10 @@ const CommunityPage = () => {
       showSnackbar(error.message || 'Failed to generate invite code', 'error');
     }
   };
-  
+
   const handleDeleteCommunity = async () => {
     if (!communityId) return;
-    
+
     try {
       await deleteCommunity(communityId);
       setOpenDeleteDialog(false);
@@ -123,27 +123,27 @@ const CommunityPage = () => {
       showSnackbar(error.message || 'Failed to delete community', 'error');
     }
   };
-  
+
   const handleOpenModifyDialog = () => {
     if (!community) return;
-    
+
     // Initialize form with current community data
     // Exclude isPublic as per requirements
     setModifyFormData({
       name: community.name,
       description: community.description
     });
-    
+
     // Set banner preview if available
     if (community.banner) {
       setModifyBannerPreview(community.banner);
     } else {
       setModifyBannerPreview(null);
     }
-    
+
     setOpenModifyDialog(true);
   };
-  
+
   const handleModifyInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setModifyFormData(prev => ({
@@ -151,12 +151,12 @@ const CommunityPage = () => {
       [name]: value
     }));
   };
-  
+
   const handleModifyBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setModifyBannerFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -167,25 +167,25 @@ const CommunityPage = () => {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleRemoveModifyBanner = () => {
     setModifyBannerFile(null);
     setModifyBannerPreview(null);
   };
-  
+
   const handleModifyCommunity = async () => {
     if (!communityId) return;
-    
+
     try {
       await modifyCommunity(communityId, {
         name: modifyFormData.name,
         description: modifyFormData.description,
         banner: modifyBannerFile
       });
-      
+
       setOpenModifyDialog(false);
       showSnackbar('Community updated successfully', 'success');
-      
+
       // Refresh community data
       await fetchUserCommunities();
     } catch (error: any) {
@@ -196,13 +196,13 @@ const CommunityPage = () => {
       }
     }
   };
-  
+
   const showSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
     setSnackbarOpen(true);
   };
-  
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -210,7 +210,7 @@ const CommunityPage = () => {
   // Function to fetch posts for the community
   const fetchPosts = async () => {
     if (!communityId) return;
-    
+
     try {
       setLoading(true);
       const result = await communityPosts(communityId, {
@@ -219,7 +219,7 @@ const CommunityPage = () => {
         search: searchTerm,
         sort: sortOrder
       });
-      
+
       setPosts(result.items);
       setTotalPosts(result.totalCount);
     } catch (error) {
@@ -253,17 +253,17 @@ const CommunityPage = () => {
       fetchUserCommunities();
     }
   }, []);
-  
+
   useEffect(() => {
     const fetchCommunityAndPosts = async () => {
       if (!communityId || communityLoading) return;
-      
+
       setLoading(true);
-      
+
       try {
         // Find the community in the user's communities
         const foundCommunity = userCommunities.find(c => c.communityId === communityId);
-        
+
         if (foundCommunity) {
           // Convert to the format expected by CommunityHeader
           const communityData: CommunityType = {
@@ -278,9 +278,9 @@ const CommunityPage = () => {
             isModerator: foundCommunity.creatorId === user?.id, // User is creator
             tags: foundCommunity.tags,
           };
-          
+
           setCommunity(communityData);
-          
+
           // Fetch posts for this community
           await fetchPosts();
         } else {
@@ -325,9 +325,9 @@ const CommunityPage = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {community && (
-        <CommunityHeader 
-          community={community} 
-          activeTab={activeTab} 
+        <CommunityHeader
+          community={community}
+          activeTab={activeTab}
           onTabChange={handleTabChange}
           onJoin={() => setOpenJoinDialog(true)}
           onLeave={handleLeaveCommunity}
@@ -336,7 +336,7 @@ const CommunityPage = () => {
           onModify={handleOpenModifyDialog}
         />
       )}
-      
+
       {/* Tab content */}
       {community && activeTab === 0 && (
         <Box>
@@ -360,7 +360,7 @@ const CommunityPage = () => {
                 size="small"
               />
             </Box>
-            
+
             <FormControl sx={{ width: '30%' }} size="small">
               <InputLabel id="sort-label">Sort</InputLabel>
               <Select
@@ -374,7 +374,7 @@ const CommunityPage = () => {
               </Select>
             </FormControl>
           </Box>
-          
+
           {postsLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <CircularProgress />
@@ -382,12 +382,13 @@ const CommunityPage = () => {
           ) : posts.length > 0 ? (
             <>
               {posts.map((post) => (
-                <PostCard 
-                  key={post.postId} 
+                <PostCard
+                  key={post.postId}
                   post={{
                     postId: post.postId,
                     content: post.content,
                     createdAt: post.createdAt,
+                    creatorName: post.creatorName,
                     ceatorId: post.ceatorId,
                     imageUrl: post.imageUrl, // Ensure imageUrl is passed correctly
                     likesCount: post.likesCount,
@@ -400,17 +401,17 @@ const CommunityPage = () => {
                     community: {
                       name: community.name,
                     }
-                  }} 
+                  }}
                 />
               ))}
-              
+
               {/* Pagination */}
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <Pagination 
-                  count={Math.ceil(totalPosts / pageSize)} 
-                  page={page} 
-                  onChange={handlePageChange} 
-                  color="primary" 
+                <Pagination
+                  count={Math.ceil(totalPosts / pageSize)}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
                 />
               </Box>
             </>
@@ -438,7 +439,7 @@ const CommunityPage = () => {
           <Typography variant="body2" color="text.secondary">
             {community.memberCount} members
           </Typography>
-          
+
           {community.isModerator && (
             <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
               <Button variant="outlined" onClick={handleOpenModifyDialog}>
@@ -454,7 +455,7 @@ const CommunityPage = () => {
           )}
         </Paper>
       )}
-      
+
       {/* Join Dialog */}
       <Dialog open={openJoinDialog} onClose={() => setOpenJoinDialog(false)}>
         <DialogTitle>Join Community</DialogTitle>
@@ -481,7 +482,7 @@ const CommunityPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Invite Code Dialog */}
       <Dialog open={openInviteDialog} onClose={() => setOpenInviteDialog(false)}>
         <DialogTitle>Invite Code</DialogTitle>
@@ -504,19 +505,19 @@ const CommunityPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenInviteDialog(false)}>Close</Button>
-          <Button 
+          <Button
             onClick={() => {
               navigator.clipboard.writeText(inviteCode);
               showSnackbar('Invite code copied to clipboard', 'success');
-            }} 
-            variant="contained" 
+            }}
+            variant="contained"
             color="primary"
           >
             Copy
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>Delete Community</DialogTitle>
@@ -532,7 +533,7 @@ const CommunityPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Modify Community Dialog */}
       <Dialog open={openModifyDialog} onClose={() => setOpenModifyDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Community</DialogTitle>
@@ -564,12 +565,12 @@ const CommunityPage = () => {
             onChange={handleModifyInputChange}
             sx={{ mb: 2 }}
           />
-          
+
           {/* Banner Upload */}
           <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
             Community Banner
           </Typography>
-          
+
           {!modifyBannerPreview ? (
             <Button
               variant="outlined"
@@ -587,14 +588,14 @@ const CommunityPage = () => {
             </Button>
           ) : (
             <Box sx={{ position: 'relative', mb: 2 }}>
-              <img 
-                src={modifyBannerPreview} 
-                alt="Banner preview" 
-                style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '4px' }} 
+              <img
+                src={modifyBannerPreview}
+                alt="Banner preview"
+                style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '4px' }}
               />
-              <Button 
-                variant="contained" 
-                color="error" 
+              <Button
+                variant="contained"
+                color="error"
                 size="small"
                 onClick={handleRemoveModifyBanner}
                 sx={{ position: 'absolute', top: 8, right: 8 }}
@@ -611,11 +612,11 @@ const CommunityPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Snackbar for notifications */}
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >

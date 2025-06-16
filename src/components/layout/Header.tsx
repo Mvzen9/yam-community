@@ -180,7 +180,7 @@ const Header = () => {
         navigate("/media");
         break;
       case 4:
-        navigate("/people");
+        navigate("/requests");
         break;
       default:
         navigate("/");
@@ -215,7 +215,7 @@ const Header = () => {
               color="inherit"
               aria-label="menu"
               onClick={handleMobileMenuOpen}
-              sx={{ 
+              sx={{
                 mr: 1,
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
@@ -238,8 +238,8 @@ const Header = () => {
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
             {isAuthenticated ? (
               <>
-                <IconButton 
-                  color="inherit" 
+                <IconButton
+                  color="inherit"
                   onClick={() => navigate('/chat')}
                   sx={{
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -286,8 +286,8 @@ const Header = () => {
                   <Avatar
                     src={user?.avatar}
                     alt={user?.username}
-                    sx={{ 
-                      width: 32, 
+                    sx={{
+                      width: 32,
                       height: 32,
                       border: '2px solid rgba(155, 79, 43, 0.2)',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -299,8 +299,8 @@ const Header = () => {
                   />
                   <Typography
                     variant="body2"
-                    sx={{ 
-                      ml: 1, 
+                    sx={{
+                      ml: 1,
                       display: { xs: "none", lg: "block" },
                       fontWeight: 600,
                       color: 'text.primary',
@@ -506,7 +506,7 @@ const Header = () => {
             <ListItemText>Create Post</ListItemText>
           </MenuItem>
           <Divider sx={{ my: 1 }} />
-          <MenuItem 
+          <MenuItem
             onClick={handleLogout}
             sx={{
               borderRadius: 1,
@@ -586,8 +586,8 @@ const Header = () => {
           ))}
           {notifications.length === 0 && (
             <ListItem>
-              <ListItemText 
-                primary="No notifications" 
+              <ListItemText
+                primary="No notifications"
                 sx={{ textAlign: 'center', color: 'text.secondary' }}
               />
             </ListItem>
@@ -621,8 +621,8 @@ const Header = () => {
       >
         <List sx={{ width: 320, maxHeight: 400, overflow: "auto" }}>
           <ListItem>
-            <ListItemText 
-              primary="Messages coming soon!" 
+            <ListItemText
+              primary="Messages coming soon!"
               sx={{ textAlign: 'center', color: 'text.secondary' }}
             />
           </ListItem>
@@ -732,7 +732,7 @@ const Header = () => {
                 <ListItemText>Create Post</ListItemText>
               </MenuItem>
               <Divider sx={{ my: 1 }} />
-              <MenuItem 
+              <MenuItem
                 onClick={handleLogout}
                 sx={{
                   borderRadius: 1,

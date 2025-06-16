@@ -26,7 +26,7 @@ authApi.interceptors.request.use(
 authApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    
+
     if (!error.response) {
       console.error('Network Error:', error.message);
       return Promise.reject(new Error('Network error. Please check your internet connection or contact support.'));
@@ -48,7 +48,7 @@ export const authAPI = {
   }) => {
     // Create FormData object for multipart/form-data request
     const formData = new FormData();
-    
+
     // Add text fields to FormData
     formData.append('username', registerData.username);
     formData.append('displayName', registerData.displayName);
@@ -57,7 +57,7 @@ export const authAPI = {
     formData.append('gender', registerData.gender);
     formData.append('birthDate', registerData.birthDate);
     formData.append('bio', registerData.bio || '');
-    
+
     // Add profile picture if available
     if (registerData.profilePicture) {
       formData.append('profilePicture', registerData.profilePicture);
@@ -69,7 +69,7 @@ export const authAPI = {
     const registerAxios = axios.create({
       baseURL: AUTH_API_BASE_URL,
     });
-    
+
     // Make the request directly to the full URL to ensure proper handling
     return registerAxios.post('/Auth/register', formData, {
       headers: {
@@ -86,7 +86,7 @@ export const authAPI = {
 
     return authApi.post('/Auth/login', requestData);
   },
-  
+
   getUserProfile: async (userId: string) => {
     // Fetch user profile data from the API using the correct endpoint
     return authApi.get(`/Auth?userId=${userId}`);

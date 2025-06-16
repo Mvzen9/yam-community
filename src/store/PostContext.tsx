@@ -21,7 +21,7 @@ interface PostContextType {
     pageNumber?: number;
     search?: string;
     sort?: 'asc' | 'desc';
-    
+
   }) => Promise<{
     items: Post[];
     totalCount: number;
@@ -75,11 +75,11 @@ export const PostProvider = ({ children }: PostProviderProps) => {
   }) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await postAPI.getCommunityPosts(communityId, params);
       const data = response.data;
-      
+
       if (data.code === 200) {
         // Update the posts state with the fetched posts
         setPosts(data.data.items);
@@ -110,11 +110,11 @@ export const PostProvider = ({ children }: PostProviderProps) => {
   }) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await postAPI.createPost(communityId, postData);
       const data = response.data;
-      
+
       if (data.code === 200) {
         const newPost = data.data;
         setPosts(prevPosts => [newPost, ...prevPosts]);
@@ -138,14 +138,14 @@ export const PostProvider = ({ children }: PostProviderProps) => {
   }) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await postAPI.modifyPost(postId, postData);
       const data = response.data;
-      
+
       if (data.code === 200) {
         const updatedPost = data.data;
-        setPosts(prevPosts => prevPosts.map(post => 
+        setPosts(prevPosts => prevPosts.map(post =>
           post.postId === postId ? updatedPost : post
         ));
         return updatedPost;
@@ -179,11 +179,11 @@ export const PostProvider = ({ children }: PostProviderProps) => {
   const deletePost = async (postId: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await postAPI.deletePost(postId);
       const data = response.data;
-      
+
       if (data.code === 200) {
         setPosts(prevPosts => prevPosts.filter(post => post.postId !== postId));
       } else {
@@ -201,16 +201,16 @@ export const PostProvider = ({ children }: PostProviderProps) => {
 
   const likePost = async (postId: string) => {
     setError(null);
-    
+
     try {
       const response = await postAPI.likePost(postId);
       const data = response.data;
-      
+
       if (data.code === 200) {
         // Check if the action was a like or unlike based on the message
         const isLiked = data.message === 'Liked';
         const isUnliked = data.message === 'Unliked';
-        
+
         // Update the post's like count in the local state
         setPosts(prevPosts => prevPosts.map(post => {
           if (post.postId === postId) {
@@ -221,7 +221,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
           }
           return post;
         }));
-        
+
         // Return an object with the success status and the action performed
         return {
           success: data.data, // Should be true if successful

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const USER_API_BASE_URL = 'https://1ac3-156-201-31-66.ngrok-free.app/api/User';
+const USER_API_BASE_URL = 'http://1ac3-156-201-31-66.ngrok-free.app/api/User';
 
 // Create axios instance with default config
 const userApi = axios.create({
@@ -54,7 +54,7 @@ export const userAPI = {
   searchUsers: async (name: string) => {
     return userApi.get(`/search?name=${encodeURIComponent(name)}`);
   },
-  
+
   // Get user profile by ID
   getUserProfile: async (userId: string) => {
     return userApi.get(`/${userId}`);

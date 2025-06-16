@@ -6,7 +6,9 @@ import { useAuth } from "../store/AuthContext";
 import { authAPI } from "../services/auth";
 import { postAPI } from "../services/post";
 import { userAPI } from "../services/user";
-
+import useGetProfile from "../hooks/useGetProfile";
+import { ProfielResponseObject } from "../hooks/useGetProfile"
+import useGetRelationStatus from "../hooks/useGetRelationStatus";
 // Define empty user structure for initial state
 const emptyUserProfile = {
   id: "",
@@ -28,17 +30,20 @@ const ProfilePage = () => {
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const { user: authUser, isAuthenticated } = useAuth();
 
+
+  const profileData = useGetProfile(userId!);
+
   useEffect(() => {
     // Fetch user data based on userId
     const fetchUserData = async () => {
       try {
         // Check if this is the current user's profile
         const isViewingOwnProfile = userId === "me" || (authUser && userId === authUser.id);
-        
+
         // If viewing own profile, use authUser.id; otherwise use the userId from params
         // Make sure we have a valid ID before making the API call
         let targetUserId = isViewingOwnProfile && authUser ? authUser.id : userId;
-        
+
         // Handle the case where userId is "me" but user is not authenticated
         if (userId === "me" && !authUser) {
           console.error("Cannot view own profile when not authenticated");
@@ -46,13 +51,13 @@ const ProfilePage = () => {
           setLoading(false);
           return;
         }
-        
+
         if (targetUserId && targetUserId !== "me") {
           console.log("Fetching profile for user ID:", targetUserId);
-          
+
           let profileData;
           let isExternalUser = false;
-          
+
           // Check if this is an external user from search (different API endpoint)
           if (isViewingOwnProfile || targetUserId.includes('-')) {
             // For current user or users with UUID format (from our system)
@@ -71,9 +76,9 @@ const ProfilePage = () => {
               profileData = response.data;
             }
           }
-          
+
           console.log("Profile data received:", profileData);
-          
+
           // Fetch user posts (only for internal users)
           let userPosts = [];
           if (!isExternalUser) {
@@ -87,7 +92,7 @@ const ProfilePage = () => {
               console.error("Error fetching user posts:", postsError);
             }
           }
-          
+
           // Create user object from API response
           const userData = {
             id: isExternalUser ? targetUserId : profileData.userId,
@@ -104,7 +109,7 @@ const ProfilePage = () => {
             posts: userPosts,
             communities: [],
           };
-          
+
           setUser(userData);
           setIsCurrentUser(isViewingOwnProfile);
         } else {
@@ -142,7 +147,7 @@ const ProfilePage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <UserProfile user={user} isCurrentUser={isCurrentUser} />
+      <UserProfile user={profileData.data!} isCurrentUser={isCurrentUser} posts={user.posts} communities={user.communities} />
     </Container>
   );
 };

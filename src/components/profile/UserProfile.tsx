@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -13,7 +13,10 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import PostCard from '../post/PostCard';
-
+import useAddFriend from '../../hooks/useAddFriend';
+import useGetProfile from '../../hooks/useGetProfile';
+import { ProfielResponseObject } from "../../hooks/useGetProfile";
+import useGetRelationStatus from '../../hooks/useGetRelationStatus';
 // Define the User type
 interface User {
   id: string;
@@ -31,20 +34,33 @@ interface User {
 }
 
 interface UserProfileProps {
-  user: User;
+  user: ProfielResponseObject;
   isCurrentUser?: boolean;
+  posts: any[],
+  communities: any[];
 }
 
-const UserProfile = ({ user, isCurrentUser = false }: UserProfileProps) => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [isFollowing, setIsFollowing] = useState(false);
 
+const UserProfile = ({ user, isCurrentUser = false, posts, communities }: UserProfileProps) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [friendStatus, setFriendStatus] = useState<string>('none');
+  const useSendRequest = useAddFriend()
+
+  const profileData = useGetProfile(user.userId).data;
+  const { data, isSuccess } = useGetRelationStatus()
+  useEffect(() => {
+    setFriendStatus(data?.relationship!);
+  }, [isSuccess])
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const handleFollowToggle = () => {
-    setIsFollowing(!isFollowing);
+    useSendRequest.mutate({ email: profileData?.email }, {
+      onSuccess: () => {
+        setFriendStatus("requested");
+      }
+    });
     // In a real app, this would call an API to follow/unfollow
   };
 
@@ -60,7 +76,7 @@ const UserProfile = ({ user, isCurrentUser = false }: UserProfileProps) => {
       <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
           <Avatar
-            src={user.avatar}
+            src={user.profilePictureUrl}
             alt={user.displayName}
             sx={{ width: 120, height: 120, mr: 3 }}
           />
@@ -74,28 +90,41 @@ const UserProfile = ({ user, isCurrentUser = false }: UserProfileProps) => {
                   Edit Profile
                 </Button>
               ) : (
-                <Button
-                  variant={isFollowing ? 'outlined' : 'contained'}
-                  color="primary"
-                  onClick={handleFollowToggle}
-                >
-                  {isFollowing ? 'Following' : 'Follow'}
-                </Button>
+                friendStatus == "none" ?
+                  <Button
+                    variant={'contained'}
+                    color="primary"
+                    onClick={handleFollowToggle}
+                  >
+                    {'Add Friends'}
+                  </Button> :
+                  <Button
+                    variant={'outlined'}
+                    color='primary'
+                    // Use the 'sx' prop to make the button non-interactive
+                    sx={{
+                      // This is the key: it tells the browser to ignore all mouse events
+                      pointerEvents: 'none',
+
+                      // This ensures the cursor doesn't change to a hand icon
+                      cursor: 'default',
+                    }}
+                  >
+                    {friendStatus === 'friends' ? 'Friends' : 'Requested'}
+                  </Button>
               )}
             </Box>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              u/{user.username} • Joined {formatJoinDate(user.joinDate)}
+              u/{user.username} • Joined {formatJoinDate(user.joinedAt)}
             </Typography>
             <Typography variant="body1" paragraph>
               {user.bio}
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Typography variant="body2">
-                <strong>{user.followers}</strong> Followers
+                <strong>{user.friendsCount}</strong> Friends
               </Typography>
-              <Typography variant="body2">
-                <strong>{user.following}</strong> Following
-              </Typography>
+
             </Box>
           </Box>
         </Box>
@@ -122,8 +151,8 @@ const UserProfile = ({ user, isCurrentUser = false }: UserProfileProps) => {
         {/* Posts tab */}
         {activeTab === 0 && (
           <Box>
-            {user.posts.length > 0 ? (
-              user.posts.map((post) => <PostCard key={post.id} post={post} />)
+            {posts.length > 0 ? (
+              posts.map((post) => <PostCard key={post.id} post={post} />)
             ) : (
               <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
                 No posts yet.
@@ -146,7 +175,7 @@ const UserProfile = ({ user, isCurrentUser = false }: UserProfileProps) => {
               Communities
             </Typography>
             <Grid container spacing={1}>
-              {user.communities.map((community) => (
+              {communities.map((community) => (
                 <Grid item key={community.id}>
                   <Chip label={community.name} clickable component="a" href={`/community/${community.id}`} />
                 </Grid>
@@ -169,19 +198,10 @@ const UserProfile = ({ user, isCurrentUser = false }: UserProfileProps) => {
               Joined
             </Typography>
             <Typography variant="body2" paragraph>
-              {formatJoinDate(user.joinDate)}
+              {formatJoinDate(user.joinedAt)}
             </Typography>
-            {user.birthdate && (
-              <>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="subtitle2" gutterBottom>
-                  Birthdate
-                </Typography>
-                <Typography variant="body2" paragraph>
-                  {user.birthdate}
-                </Typography>
-              </>
-            )}
+
+
             {user.gender && (
               <>
                 <Divider sx={{ my: 2 }} />

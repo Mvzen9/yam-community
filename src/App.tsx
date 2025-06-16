@@ -17,6 +17,7 @@ import NotFound from './pages/NotFound';
 import CreateCommunity from './pages/CreateCommunity';
 import JoinCommunity from './pages/JoinCommunity';
 import Chat from './pages/Chat';
+import FriendRequests from './pages/friendRequests';
 
 // Context Providers
 import { AuthProvider, useAuth } from './store/AuthContext';
@@ -69,8 +70,8 @@ function App() {
                         <Route path="community/join" element={<JoinCommunity />} />
                         <Route path="post/:postId" element={<PostDetail />} />
                         <Route path="search" element={<Search />} />
-                        <Route path="chat" element={<Chat />} />
-                        <Route path="*" element={<NotFound />} />
+                        <Route path="requests" element={<FriendRequests />} />
+                        <Route path="" element={<NotFound />} />
                       </Route>
                     </Routes>
                   </Router>

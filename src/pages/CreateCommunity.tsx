@@ -97,7 +97,7 @@ const CreateCommunity = () => {
   return (
     <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
       <Typography variant="h5" component="h1" gutterBottom>
-        Create a New Community
+       
       </Typography>
 
       {(error || apiError) && (

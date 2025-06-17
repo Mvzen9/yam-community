@@ -35,7 +35,7 @@ const ProfilePage = () => {
   console.log(userId);
 
   useEffect(() => {
-    // Fetch user data based on userId
+    
     const fetchUserData = async () => {
       try {
         // Check if this is the current user's profile
@@ -54,7 +54,7 @@ const ProfilePage = () => {
         }
 
         if (targetUserId && targetUserId !== "me") {
-          console.log("Fetching profile for user ID:", targetUserId);
+         
 
           let profileData;
           let isExternalUser = false;
@@ -78,7 +78,7 @@ const ProfilePage = () => {
             }
           }
 
-          console.log("Profile data received:", profileData);
+      
 
           // Fetch user posts (only for internal users)
           let userPosts = [];

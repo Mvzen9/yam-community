@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../store/AuthContext";
 import Logo from "./Logo";
 import AnimatedBox from "../animation/AnimatedBox";
 import UserSearch from "../UI/UserSearch";
@@ -40,7 +41,6 @@ import ForumIcon from "@mui/icons-material/Forum";
 import HomeIcon from "@mui/icons-material/Home";
 import ExploreIcon from "@mui/icons-material/Explore";
 import ChatIcon from "@mui/icons-material/Chat";
-import { useAuth } from "../../store/AuthContext";
 import { useNotifications } from "../../store/NotificationContext";
 import RequestItem from "../RequestItem";
 import FriendRequestsPopover from "../FriendRequestsPopover";
@@ -63,20 +63,20 @@ const handleDeclineRequest = (requestId, username) => {
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: 12,
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
+  background: "rgba(255, 255, 255, 0.9)",
+  backdropFilter: "blur(10px)",
   border: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   "&:hover": {
-    background: 'rgba(255, 255, 255, 1)',
+    background: "rgba(255, 255, 255, 1)",
     border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
-    transform: 'translateY(-1px)',
-    boxShadow: '0 4px 20px rgba(155, 79, 43, 0.15)',
+    transform: "translateY(-1px)",
+    boxShadow: "0 4px 20px rgba(155, 79, 43, 0.15)",
   },
   "&:focus-within": {
     border: `2px solid ${theme.palette.primary.main}`,
-    boxShadow: '0 0 0 3px rgba(155, 79, 43, 0.1)',
-    transform: 'translateY(-2px)',
+    boxShadow: "0 0 0 3px rgba(155, 79, 43, 0.1)",
+    transform: "translateY(-2px)",
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -98,7 +98,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   color: theme.palette.primary.main,
-  transition: 'color 0.3s ease',
+  transition: "color 0.3s ease",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -121,17 +121,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Header = () => {
+const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
-  const {
-    notifications,
-    unreadCount: notificationCount,
-    markAsRead,
-  } = useNotifications();
+  // const {
+  //   notifications,
+  //   unreadCount: notificationCount,
+  //   markAsRead,
+  // } = useNotifications();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] =
@@ -200,15 +200,30 @@ const Header = () => {
     }
   };
 
+  const handleProfileNavigation = () => {
+    if (user?.id) {
+      navigate(`/profile/${user.id}`);
+    }
+  };
+
+  const handleMenuItemClick = (route: string) => {
+    handleMenuClose();
+    if (route === "profile") {
+      handleProfileNavigation();
+    } else {
+      navigate(route);
+    }
+  };
+
   return (
     <AppBar
       position="sticky"
       sx={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(10px)',
+        background: "rgba(255, 255, 255, 0.95)",
+        backdropFilter: "blur(10px)",
         color: "text.primary",
-        borderBottom: '1px solid rgba(242, 226, 208, 0.3)',
-        boxShadow: '0 4px 20px rgba(155, 79, 43, 0.1)',
+        borderBottom: "1px solid rgba(242, 226, 208, 0.3)",
+        boxShadow: "0 4px 20px rgba(155, 79, 43, 0.1)",
         width: "100%",
         zIndex: theme.zIndex.drawer + 1,
       }}
@@ -230,10 +245,10 @@ const Header = () => {
               onClick={handleMobileMenuOpen}
               sx={{
                 mr: 1,
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  transform: 'scale(1.1) rotate(90deg)',
-                  backgroundColor: 'rgba(155, 79, 43, 0.1)',
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  transform: "scale(1.1) rotate(90deg)",
+                  backgroundColor: "rgba(155, 79, 43, 0.1)",
                 },
               }}
             >
@@ -243,37 +258,50 @@ const Header = () => {
           <Logo />
         </AnimatedBox>
 
-        <AnimatedBox animation="scaleIn" delay={0.2} sx={{ flexGrow: 1, display: "flex", justifyContent: "center", maxWidth: "600px" }}>
+        <AnimatedBox
+          animation="scaleIn"
+          delay={0.2}
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            justifyContent: "center",
+            maxWidth: "600px",
+          }}
+        >
           <UserSearch onSearch={handleSearch} />
         </AnimatedBox>
 
         <AnimatedBox animation="slideInRight" delay={0.3}>
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             {isAuthenticated ? (
               <>
                 <IconButton
                   color="inherit"
-                  onClick={() => navigate('/chat')}
+                  onClick={() => navigate("/chat")}
                   sx={{
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'scale(1.1)',
-                      backgroundColor: 'rgba(155, 79, 43, 0.1)',
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      transform: "scale(1.1)",
+                      backgroundColor: "rgba(155, 79, 43, 0.1)",
                     },
                   }}
-                >
-
-
-
-                </IconButton>
+                ></IconButton>
                 <IconButton
                   color="inherit"
-                  onClick={() => window.open('https://yam-chat.netlify.app/', '_blank')}
+                  onClick={() =>
+                    window.open("https://yam-chat.netlify.app/", "_blank")
+                  }
                   sx={{
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'scale(1.1)',
-                      backgroundColor: 'rgba(155, 79, 43, 0.1)',
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      transform: "scale(1.1)",
+                      backgroundColor: "rgba(155, 79, 43, 0.1)",
                     },
                   }}
                 >
@@ -283,16 +311,16 @@ const Header = () => {
                   color="inherit"
                   onClick={handleNotificationClick}
                   sx={{
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'scale(1.1)',
-                      backgroundColor: 'rgba(155, 79, 43, 0.1)',
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      transform: "scale(1.1)",
+                      backgroundColor: "rgba(155, 79, 43, 0.1)",
                     },
                   }}
                 >
-                  <Badge badgeContent={notificationCount} color="error">
+                 
                     <NotificationsIcon />
-                  </Badge>
+                  
                 </IconButton>
                 <Box
                   sx={{
@@ -301,10 +329,10 @@ const Header = () => {
                     cursor: "pointer",
                     padding: 1,
                     borderRadius: 2,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                      transform: 'translateY(-1px)',
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      backgroundColor: "rgba(155, 79, 43, 0.1)",
+                      transform: "translateY(-1px)",
                     },
                   }}
                   onClick={handleProfileMenuOpen}
@@ -315,11 +343,11 @@ const Header = () => {
                     sx={{
                       width: 32,
                       height: 32,
-                      border: '2px solid rgba(155, 79, 43, 0.2)',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      '&:hover': {
-                        border: '2px solid #9B4F2B',
-                        transform: 'scale(1.1)',
+                      border: "2px solid rgba(155, 79, 43, 0.2)",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      "&:hover": {
+                        border: "2px solid #9B4F2B",
+                        transform: "scale(1.1)",
                       },
                     }}
                   />
@@ -329,7 +357,7 @@ const Header = () => {
                       ml: 1,
                       display: { xs: "none", lg: "block" },
                       fontWeight: 600,
-                      color: 'text.primary',
+                      color: "text.primary",
                     }}
                   >
                     {user?.username}
@@ -350,10 +378,10 @@ const Header = () => {
                     textTransform: "none",
                     fontSize: "14px",
                     height: "36px",
-                    borderWidth: '2px',
-                    '&:hover': {
-                      borderWidth: '2px',
-                      transform: 'translateY(-2px)',
+                    borderWidth: "2px",
+                    "&:hover": {
+                      borderWidth: "2px",
+                      transform: "translateY(-2px)",
                     },
                   }}
                 >
@@ -372,10 +400,12 @@ const Header = () => {
                     textTransform: "none",
                     fontSize: "14px",
                     height: "36px",
-                    background: 'linear-gradient(135deg, #9B4F2B 0%, #B67D62 100%)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #723A20 0%, #9B4F2B 100%)',
-                      transform: 'translateY(-2px)',
+                    background:
+                      "linear-gradient(135deg, #9B4F2B 0%, #B67D62 100%)",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(135deg, #723A20 0%, #9B4F2B 100%)",
+                      transform: "translateY(-2px)",
                     },
                   }}
                 >
@@ -389,12 +419,12 @@ const Header = () => {
 
       <Box
         sx={{
-          background: 'linear-gradient(135deg, rgba(242, 226, 208, 0.3) 0%, rgba(247, 237, 227, 0.3) 100%)',
+          background:
+            "linear-gradient(135deg, rgba(242, 226, 208, 0.3) 0%, rgba(247, 237, 227, 0.3) 100%)",
           borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           px: 2,
         }}
-      >
-      </Box>
+      ></Box>
 
       <Box
         sx={{
@@ -403,7 +433,8 @@ const Header = () => {
           px: 2,
           py: 1,
           borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          background: 'linear-gradient(135deg, rgba(242, 226, 208, 0.1) 0%, rgba(247, 237, 227, 0.1) 100%)',
+          background:
+            "linear-gradient(135deg, rgba(242, 226, 208, 0.1) 0%, rgba(247, 237, 227, 0.1) 100%)",
           fontSize: "14px",
         }}
       >
@@ -415,11 +446,11 @@ const Header = () => {
               onChange={(e) => setSafeSearch(e.target.checked)}
               color="primary"
               sx={{
-                '& .MuiSwitch-thumb': {
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                "& .MuiSwitch-thumb": {
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 },
-                '& .MuiSwitch-track': {
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                "& .MuiSwitch-track": {
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 },
               }}
             />
@@ -442,27 +473,24 @@ const Header = () => {
         PaperProps={{
           sx: {
             borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(242, 226, 208, 0.3)',
-            boxShadow: '0 8px 30px rgba(155, 79, 43, 0.15)',
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(242, 226, 208, 0.3)",
+            boxShadow: "0 8px 30px rgba(155, 79, 43, 0.15)",
             mt: 1,
           },
         }}
       >
         <Box>
           <MenuItem
-            onClick={() => {
-              handleMenuClose();
-              navigate("/profile/me");
-            }}
+            onClick={() => handleMenuItemClick("profile")}
             sx={{
               borderRadius: 1,
-              margin: '4px 8px',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': {
-                backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                transform: 'translateX(4px)',
+              margin: "4px 8px",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                backgroundColor: "rgba(155, 79, 43, 0.1)",
+                transform: "translateX(4px)",
               },
             }}
           >
@@ -478,11 +506,11 @@ const Header = () => {
             }}
             sx={{
               borderRadius: 1,
-              margin: '4px 8px',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': {
-                backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                transform: 'translateX(4px)',
+              margin: "4px 8px",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                backgroundColor: "rgba(155, 79, 43, 0.1)",
+                transform: "translateX(4px)",
               },
             }}
           >
@@ -496,12 +524,12 @@ const Header = () => {
             onClick={handleLogout}
             sx={{
               borderRadius: 1,
-              margin: '4px 8px',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': {
-                backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                transform: 'translateX(4px)',
-                color: 'error.main',
+              margin: "4px 8px",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                backgroundColor: "rgba(244, 67, 54, 0.1)",
+                transform: "translateX(4px)",
+                color: "error.main",
               },
             }}
           >
@@ -535,10 +563,10 @@ const Header = () => {
         PaperProps={{
           sx: {
             borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(242, 226, 208, 0.3)',
-            boxShadow: '0 8px 30px rgba(155, 79, 43, 0.15)',
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(242, 226, 208, 0.3)",
+            boxShadow: "0 8px 30px rgba(155, 79, 43, 0.15)",
             mt: 1,
           },
         }}
@@ -547,7 +575,7 @@ const Header = () => {
           <ListItem>
             <ListItemText
               primary="Messages coming soon!"
-              sx={{ textAlign: 'center', color: 'text.secondary' }}
+              sx={{ textAlign: "center", color: "text.secondary" }}
             />
           </ListItem>
         </List>
@@ -564,10 +592,10 @@ const Header = () => {
             width: "250px",
             maxWidth: "80vw",
             borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(242, 226, 208, 0.3)',
-            boxShadow: '0 8px 30px rgba(155, 79, 43, 0.15)',
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(242, 226, 208, 0.3)",
+            boxShadow: "0 8px 30px rgba(155, 79, 43, 0.15)",
             mt: 1,
           },
         }}
@@ -576,17 +604,14 @@ const Header = () => {
           {isAuthenticated ? (
             <>
               <MenuItem
-                onClick={() => {
-                  handleMenuClose();
-                  navigate("/profile/me");
-                }}
+                onClick={() => handleMenuItemClick("profile")}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(155, 79, 43, 0.1)",
+                    transform: "translateX(4px)",
                   },
                 }}
               >
@@ -602,11 +627,11 @@ const Header = () => {
                 }}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(155, 79, 43, 0.1)",
+                    transform: "translateX(4px)",
                   },
                 }}
               >
@@ -622,11 +647,11 @@ const Header = () => {
                 }}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(155, 79, 43, 0.1)",
+                    transform: "translateX(4px)",
                   },
                 }}
               >
@@ -642,11 +667,11 @@ const Header = () => {
                 }}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(155, 79, 43, 0.1)",
+                    transform: "translateX(4px)",
                   },
                 }}
               >
@@ -660,12 +685,12 @@ const Header = () => {
                 onClick={handleLogout}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                    transform: 'translateX(4px)',
-                    color: 'error.main',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(244, 67, 54, 0.1)",
+                    transform: "translateX(4px)",
+                    color: "error.main",
                   },
                 }}
               >
@@ -681,11 +706,11 @@ const Header = () => {
                 }}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(155, 79, 43, 0.1)",
+                    transform: "translateX(4px)",
                   },
                 }}
               >
@@ -698,11 +723,11 @@ const Header = () => {
                 }}
                 sx={{
                   borderRadius: 1,
-                  margin: '4px 8px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(155, 79, 43, 0.1)',
-                    transform: 'translateX(4px)',
+                  margin: "4px 8px",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(155, 79, 43, 0.1)",
+                    transform: "translateX(4px)",
                   },
                 }}
               >
@@ -717,4 +742,3 @@ const Header = () => {
 };
 
 export default Header;
-

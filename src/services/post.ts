@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const POST_API_BASE_URL = 'http://todo-app.polandcentral.cloudapp.azure.com:5003/api';
+const POST_API_BASE_URL = 'http://postservice.runasp.net/api';
 
 const postApi = axios.create({
   baseURL: POST_API_BASE_URL,
